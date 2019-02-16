@@ -1,0 +1,92 @@
+import typing
+import datetime as dt
+import uuid
+import decimal
+
+import pytest
+
+from marshmallow import fields
+from main import Schema
+
+
+@pytest.mark.parametrize(
+    "attr_type,field,data,loaded",
+    [
+        (int, fields.Integer(required=True), 5, 5),
+        (str, fields.String(required=True), "string", "string"),
+        (float, fields.Float(required=True), 5.0, 5.0),
+        (bool, fields.Boolean(required=True), "true", True),
+        (
+            dt.datetime,
+            fields.DateTime(required=True),
+            "2019-02-15 00:00:00",
+            dt.datetime(2019, 2, 15, 0, 0),
+        ),
+        (
+            uuid.UUID,
+            fields.UUID(required=True),
+            "ec367d2b-53ac-44cc-9db1-45b81cf3b78b",
+            uuid.UUID("ec367d2b-53ac-44cc-9db1-45b81cf3b78b"),
+        ),
+        (dt.time, fields.Time(required=True), "00:00:00", dt.time(0, 0)),
+        (dt.date, fields.Date(required=True), "2019-02-15", dt.date(2019, 2, 15)),
+        (
+            dt.timedelta,
+            fields.TimeDelta(precision="seconds", required=True),
+            5,
+            dt.timedelta(seconds=5),
+        ),
+        (decimal.Decimal, fields.Decimal(required=True), 5.0, decimal.Decimal("5.0")),
+    ],
+)
+def test_basic_types(attr_type, field, data, loaded):
+    class Response(Schema):
+        field: attr_type
+
+    assert repr(Response.schema().__dict__["declared_fields"]["field"]) == repr(field)
+    assert Response.schema().load({"field": data}) == {"field": loaded}
+
+
+def test_required_field():
+    class Response(Schema):
+        required_field: int
+
+    assert repr(
+        Response.schema().__dict__["declared_fields"]["required_field"]
+    ) == repr(fields.Integer(required=True))
+
+
+def test_optional():
+    class Response(Schema):
+        optional_field: typing.Optional[int] = None
+
+    assert repr(
+        Response.schema().__dict__["declared_fields"]["optional_field"]
+    ) == repr(fields.Integer())
+
+
+# @pytest.mark.skipped()
+# def test_common():
+#     class Response(Schema):
+#         a: int
+#         b = None
+#         c = fields.Integer()
+
+# @pytest.mark.parametrize(
+#     "attr_type,field,data,loaded", [
+#         # (
+#         #     typing.List,
+#         #     fields.List(fields.Float()),
+#         #     {"field": [5.0, 5.0, 5.0]},
+#         #     {"field": [5.0, 5.0, 5.0]}
+#         # ),
+#         # (list, fields.Integer(),  {"field": 5}),
+#         # (set, fields.Integer(),  {"field": 5}),
+#     ]
+# )
+# def test_nested_types(attr_type, field, data, loaded):
+#     class Response(Schema):
+#         field: attr_type
+
+#     assert repr(Response.schema().__dict__["declared_fields"]["field"]) == repr(field)
+#     assert Response.schema().load({"field": data}) == {"field": loaded}
