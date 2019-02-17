@@ -1,10 +1,32 @@
-Marshmallow schemas with annotations
-------------------------------------
+Marshmallow Jam
+---------------
+
+Some extra sweets for marshmallow. 
+
+
+Use annotations for schema description.
+=======================================
 
     class Response(Schema):
         a: float
-        b = None
-        c = fields.Integer()
+        b: Optional[dt.datetime]
+        
 
-    response = Response.schema().load({"a": 5.0, "c": 5})
-    response.a
+When annotations not enough
+===========================
+
+    class Response(Schema):
+        c: str = fields.Email()
+
+
+And IDE autocomplete cause now your data is instances of relevant classes
+=========================================================================
+    
+    class User(Schema):
+        name: str 
+
+    class Response(Schema):
+        user: User
+        
+    response = Response.schema().load({"user": {"name": "Vasya Pupkin"}})
+    response.user.name

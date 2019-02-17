@@ -67,10 +67,10 @@ def test_optional():
 
 # @pytest.mark.skipped()
 # def test_common():
-#     class Response(Schema):
-#         a: int
-#         b = None
-#         c = fields.Integer()
+# class Response(Schema):
+#     a: int
+#     b = None
+#     c = fields.Integer()
 
 # @pytest.mark.parametrize(
 #     "attr_type,field,data,loaded", [
