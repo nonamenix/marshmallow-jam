@@ -32,6 +32,6 @@ class User(Schema):
 class Response(Schema):
     user: User
 
-response = Response.schema().load({"user": {"name": "Vasya Pupkin"}})
+response = Response.load({"user": {"name": "Vasya Pupkin"}})
 response.user.name
 ```
