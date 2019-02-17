@@ -5,7 +5,8 @@ import inspect
 from collections import ChainMap
 from pprint import pprint
 
-from marshmallow import fields, Schema as MarshMallowSchema
+from marshmallow import fields, Schema as MarshMallowSchema, post_load
+from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema, with_metaclass
 
 import datetime as dt
 import uuid
@@ -20,22 +21,22 @@ TYPE_MAPPING = {
     float: fields.Float(required=True),
     bool: fields.Boolean(required=True),
     int: fields.Integer(required=True),
+    
     uuid.UUID: fields.UUID(required=True),
     decimal.Decimal: fields.Decimal(required=True),
+    
     dt.datetime: fields.DateTime(required=True),
     dt.time: fields.Time(required=True),
     dt.date: fields.Date(required=True),
     dt.timedelta: fields.TimeDelta(required=True),
+    
     Optional[int]: fields.Integer()
+    
     # tuple: fields.Raw,
     # list: fields.List,
     # List: fields.List,
     # set: fields.Raw,
 }
-
-
-def get_field(attr_type):
-    return TYPE_MAPPING.get(attr_type)
 
 
 def merge_dicts(*dicts):
@@ -48,15 +49,14 @@ def merge_dicts(*dicts):
     return merged
 
 
-def get_class_fields(cls):
-    return merge_dicts(get_fields_from_annotations(cls), get_fields_from_values(cls))
+def get_field(attr_type):
+    return TYPE_MAPPING.get(attr_type)
 
 
-def get_fields_from_annotations(cls):
-    annotations = dict(inspect.getmembers(cls)).get("__annotations__", {}).items()
-
+def get_fields_from_annotations(annotations):
     mapped_fields = [
-        (attr_name, get_field(attr_type)) for attr_name, attr_type in annotations
+        (attr_name, get_field(attr_type))
+        for attr_name, attr_type in annotations.items()
     ]
 
     return {
@@ -66,24 +66,23 @@ def get_fields_from_annotations(cls):
     }
 
 
-def get_fields_from_values(cls):
-    return {
-        attr_name: attr_type
-        for attr_name, attr_type in dict(inspect.getmembers(cls))["__dict__"].items()
-        if isinstance(attr_type, fields.Field)
-    }
-
-
-class MetaSchema(type):
-    def __new__(cls, clsname, bases, dct):
-        newclass = super().__new__(cls, clsname, bases, dct)
-        setattr(
-            newclass,
-            "schema",
-            type(f"{clsname}Schema", (MarshMallowSchema,), get_class_fields(newclass)),
+class SchemaMeta(BaseSchemaMeta):
+    def __new__(mcs, name, bases, attrs):
+        klass = super().__new__(
+            mcs,
+            name,
+            bases,
+            merge_dicts(
+                attrs, get_fields_from_annotations(attrs.get("__annotations__", {}))
+            ),
         )
-        return newclass
+        return klass
 
 
-class Schema(metaclass=MetaSchema):
-    schema: Optional[MarshMallowSchema]
+class Schema(with_metaclass(SchemaMeta, BaseSchema)):
+    __doc__ = BaseSchema.__doc__
+
+    @post_load
+    def make_object(self, data):
+        self.__dict__ = merge_dicts(self.__dict__, data)
+        return self

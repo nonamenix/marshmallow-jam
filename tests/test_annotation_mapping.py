@@ -43,8 +43,8 @@ def test_basic_types(attr_type, field, data, loaded):
     class Response(Schema):
         field: attr_type
 
-    assert repr(Response.schema().__dict__["declared_fields"]["field"]) == repr(field)
-    assert Response.schema().load({"field": data}) == {"field": loaded}
+    assert repr(Response().__dict__["declared_fields"]["field"]) == repr(field)
+    assert Response().load({"field": data}).field == loaded
 
 
 def test_required_field():
@@ -52,7 +52,7 @@ def test_required_field():
         required_field: int
 
     assert repr(
-        Response.schema().__dict__["declared_fields"]["required_field"]
+        Response().__dict__["declared_fields"]["required_field"]
     ) == repr(fields.Integer(required=True))
 
 
@@ -61,7 +61,7 @@ def test_optional():
         optional_field: typing.Optional[int] = None
 
     assert repr(
-        Response.schema().__dict__["declared_fields"]["optional_field"]
+        Response().__dict__["declared_fields"]["optional_field"]
     ) == repr(fields.Integer())
 
 
@@ -88,5 +88,5 @@ def test_optional():
 #     class Response(Schema):
 #         field: attr_type
 
-#     assert repr(Response.schema().__dict__["declared_fields"]["field"]) == repr(field)
-#     assert Response.schema().load({"field": data}) == {"field": loaded}
+#     assert repr(Response().__dict__["declared_fields"]["field"]) == repr(field)
+#     assert Response().load({"field": data}) == {"field": loaded}
