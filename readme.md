@@ -1,11 +1,11 @@
 Marshmallow Jam
----------------
+===============
 
 Some extra sweets for marshmallow. 
 
 
 Use annotations for schema description.
-=======================================
+---------------------------------------
 
 ```python
 class Response(Schema):
@@ -15,7 +15,7 @@ class Response(Schema):
         
 
 When annotations not enough
-===========================
+---------------------------
 
 ```python
 class Response(Schema):
@@ -23,7 +23,7 @@ class Response(Schema):
 ```
 
 And IDE autocomplete cause now your data is instances of relevant classes
-=========================================================================
+-------------------------------------------------------------------------
 
 ```python
 class User(Schema):
