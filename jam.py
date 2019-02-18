@@ -52,7 +52,6 @@ def is_list(annotation: typing.Type) -> bool:
     return False
 
 
-
 def is_optional(annotation: typing.Type) -> bool:
     return (
         hasattr(annotation, "__origin__")
