@@ -48,17 +48,17 @@ def validate_annotation(annotation: types.Type) -> None:
 
 
 def is_optional(annotation: types.Type) -> bool:
-    return isinstance(annotation, UnionType) and NoneType in annotation.__args__
+    return (
+        hasattr(annotation, "__origin__")
+        and annotation.__origin__ is types.Union
+        and len(annotation.__args__) == 2
+        and NoneType in annotation.__args__
+    )
 
 
-def unwrap_optional_type(annotation: types.Union) -> types.Type:
+def unpack_optional_type(annotation: types.Union) -> types.Type:
     """Optional[Type] -> Type"""
-    ts = [t for t in annotation.__args__ if t is not NoneType]
-
-    if len(ts) != 1:
-        raise NotValidAnnotation("Union of several types not allowed")
-
-    return ts[0]
+    return [t for t in annotation.__args__ if t is not NoneType][0]
 
 
 def get_marshmallow_field(annotation):
@@ -67,7 +67,7 @@ def get_marshmallow_field(annotation):
     opts = {}
 
     if is_optional(annotation):
-        annotation = unwrap_optional_type(annotation)
+        annotation = unpack_optional_type(annotation)
     else:
         opts["required"] = True
 
