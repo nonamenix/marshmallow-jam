@@ -1,4 +1,4 @@
-import typing
+import typing as t
 import datetime as dt
 import uuid
 import decimal
@@ -6,7 +6,7 @@ import decimal
 import pytest
 
 from marshmallow import fields
-from main import Schema
+from jam import Schema
 
 
 @pytest.mark.parametrize(
@@ -19,8 +19,8 @@ from main import Schema
         (
             dt.datetime,
             fields.DateTime(required=True),
-            "2019-02-15 00:00:00",
-            dt.datetime(2019, 2, 15, 0, 0),
+            "2019-02-15T12:03:14",
+            dt.datetime(2019, 2, 15, 12, 3, 14),
         ),
         (
             uuid.UUID,
@@ -41,28 +41,28 @@ from main import Schema
 )
 def test_basic_types(attr_type, field, data, loaded):
     class Response(Schema):
-        field: attr_type
+        foo: attr_type
 
-    assert repr(Response().__dict__["declared_fields"]["field"]) == repr(field)
-    assert Response().load({"field": data}).field == loaded
+    assert repr(Response().declared_fields["foo"]) == repr(field)
+    assert Response().load({"foo": data}).foo == loaded
 
 
 def test_required_field():
     class Response(Schema):
         required_field: int
 
-    assert repr(
-        Response().__dict__["declared_fields"]["required_field"]
-    ) == repr(fields.Integer(required=True))
+    assert repr(Response().__dict__["declared_fields"]["required_field"]) == repr(
+        fields.Integer(required=True)
+    )
 
 
 def test_optional():
     class Response(Schema):
-        optional_field: typing.Optional[int] = None
+        optional_field: t.Optional[int] = None
 
-    assert repr(
-        Response().__dict__["declared_fields"]["optional_field"]
-    ) == repr(fields.Integer())
+    assert repr(Response().__dict__["declared_fields"]["optional_field"]) == repr(
+        fields.Integer()
+    )
 
 
 # @pytest.mark.skipped()
