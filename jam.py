@@ -24,7 +24,6 @@ TYPE_MAPPING = {
     dt.time: fields.Time,
     dt.date: fields.Date,
     dt.timedelta: fields.TimeDelta,
-    types.Optional[int]: fields.Integer
     # tuple: fields.Raw,
     # list: fields.List,
     # List: fields.List,
@@ -52,7 +51,7 @@ def is_optional(annotation: types.Type) -> bool:
     return isinstance(annotation, UnionType) and NoneType in annotation.__args__
 
 
-def expand_optional_type(annotation: types.Union) -> types.Type:
+def unwrap_optional_type(annotation: types.Union) -> types.Type:
     """Optional[Type] -> Type"""
     ts = [t for t in annotation.__args__ if t is not NoneType]
 
@@ -65,7 +64,14 @@ def expand_optional_type(annotation: types.Union) -> types.Type:
 def get_marshmallow_field(annotation):
     validate_annotation(annotation)
 
-    return TYPE_MAPPING.get(annotation)(required=not is_optional(annotation))
+    opts = {}
+
+    if is_optional(annotation):
+        annotation = unwrap_optional_type(annotation)
+    else:
+        opts["required"] = True
+
+    return TYPE_MAPPING.get(annotation)(**opts)
 
 
 def get_fields_from_annotations(annotations):

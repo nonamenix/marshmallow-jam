@@ -1,6 +1,6 @@
 import pytest
 
-from jam import is_optional, expand_optional_type, NotValidAnnotation
+from jam import is_optional, unwrap_optional_type, NotValidAnnotation
 import typing as types
 
 
@@ -22,10 +22,10 @@ def test_is_optional(annotation, expected):
     "annotation,expected",
     [(types.Optional[int], int), (types.Optional[types.List], types.List)],
 )
-def test_expand_optional_type(annotation, expected):
-    assert expand_optional_type(annotation) == expected
+def test_unwrap_optional_type(annotation, expected):
+    assert unwrap_optional_type(annotation) == expected
 
 
-def test_expand_optional_type_from_union_with_several_type():
+def test_unwrap_optional_type_from_union_with_several_type():
     with pytest.raises(NotValidAnnotation):
-        expand_optional_type(types.Union[type(None), int, float])
+        unwrap_optional_type(types.Union[type(None), int, float])

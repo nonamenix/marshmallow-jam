@@ -60,9 +60,7 @@ def test_optional():
     class Response(Schema):
         optional_field: t.Optional[int] = None
 
-    assert repr(Response().__dict__["declared_fields"]["optional_field"]) == repr(
-        fields.Integer()
-    )
+    assert repr(Response().declared_fields["optional_field"]) == repr(fields.Integer())
 
 
 # @pytest.mark.skipped()
