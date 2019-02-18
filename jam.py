@@ -46,9 +46,10 @@ def validate_annotation(annotation: typing.Type) -> None:
     if False:
         raise NotValidAnnotation()
 
+
 # todo: flat_sequence? set, tuple, etc
 def is_list(annotation: typing.Type) -> bool:
-
+    return False
 
 
 
