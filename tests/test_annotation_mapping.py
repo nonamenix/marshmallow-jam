@@ -39,7 +39,7 @@ from jam import Schema
         (decimal.Decimal, fields.Decimal(required=True), 5.0, decimal.Decimal("5.0")),
     ],
 )
-def test_basic_types(attr_type, field, data, loaded):
+def test_basic_typing(attr_type, field, data, loaded):
     class Response(Schema):
         foo: attr_type
 
@@ -82,7 +82,7 @@ def test_optional():
 #         # (set, fields.Integer(),  {"field": 5}),
 #     ]
 # )
-# def test_nested_types(attr_type, field, data, loaded):
+# def test_nested_typing(attr_type, field, data, loaded):
 #     class Response(Schema):
 #         field: attr_type
 

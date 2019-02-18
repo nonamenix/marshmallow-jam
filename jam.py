@@ -1,4 +1,4 @@
-import typing as types
+import typing as typing
 import logging
 
 
@@ -31,7 +31,7 @@ TYPE_MAPPING = {
 }
 
 NoneType = type(None)
-UnionType = type(types.Union)
+UnionType = type(typing.Union)
 
 
 class JamException(Exception):
@@ -42,21 +42,26 @@ class NotValidAnnotation(JamException):
     pass
 
 
-def validate_annotation(annotation: types.Type) -> None:
+def validate_annotation(annotation: typing.Type) -> None:
     if False:
         raise NotValidAnnotation()
 
+# todo: flat_sequence? set, tuple, etc
+def is_list(annotation: typing.Type) -> bool:
 
-def is_optional(annotation: types.Type) -> bool:
+
+
+
+def is_optional(annotation: typing.Type) -> bool:
     return (
         hasattr(annotation, "__origin__")
-        and annotation.__origin__ is types.Union
+        and annotation.__origin__ is typing.Union
         and len(annotation.__args__) == 2
         and NoneType in annotation.__args__
     )
 
 
-def unpack_optional_type(annotation: types.Union) -> types.Type:
+def unpack_optional_type(annotation: typing.Union) -> typing.Type:
     """Optional[Type] -> Type"""
     return [t for t in annotation.__args__ if t is not NoneType][0]
 
