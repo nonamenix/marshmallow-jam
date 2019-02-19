@@ -61,23 +61,3 @@ def test_optional():
         optional_field: t.Optional[int] = None
 
     assert repr(Response().declared_fields["optional_field"]) == repr(fields.Integer())
-
-
-# @pytest.mark.parametrize(
-#     "attr_type,field,data,loaded", [
-#         # (
-#         #     typing.List,
-#         #     fields.List(fields.Float()),
-#         #     {"field": [5.0, 5.0, 5.0]},
-#         #     {"field": [5.0, 5.0, 5.0]}
-#         # ),
-#         # (list, fields.Integer(),  {"field": 5}),
-#         # (set, fields.Integer(),  {"field": 5}),
-#     ]
-# )
-# def test_nested_typing(attr_type, field, data, loaded):
-#     class Response(Schema):
-#         field: attr_type
-
-#     assert repr(Response().__dict__["declared_fields"]["field"]) == repr(field)
-#     assert Response().load({"field": data}) == {"field": loaded}
