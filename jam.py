@@ -13,7 +13,7 @@ import decimal
 logger = logging.getLogger(__name__)
 
 
-TYPE_MAPPING = {
+BASIC_TYPES_MAPPING = {
     str: fields.String,
     float: fields.Float,
     bool: fields.Boolean,
@@ -24,11 +24,13 @@ TYPE_MAPPING = {
     dt.time: fields.Time,
     dt.date: fields.Date,
     dt.timedelta: fields.TimeDelta,
-    # tuple: fields.Raw,
-    # list: fields.List,
-    # List: fields.List,
-    # set: fields.Raw,
 }
+
+# tuple: fields.Raw,
+# list: fields.List,
+# List: fields.List,
+# set: fields.Raw,
+
 
 NoneType = type(None)
 UnionType = type(typing.Union)
@@ -53,9 +55,11 @@ def is_nested_schema(annotation: typing.Type) -> bool:
 
 # todo: flat_sequence? set, tuple, etc
 def is_many(annotation: typing.Type) -> bool:
-    return (
-        hasattr(annotation, "__origin__") and annotation.__origin__ is list
-    ) or annotation is list
+    return hasattr(annotation, "__origin__") and annotation.__origin__ is list
+
+
+def unpack_many(annotation: typing.Type) -> bool:
+    return annotation.__args__[0]
 
 
 def is_optional(annotation: typing.Type) -> bool:
@@ -75,14 +79,30 @@ def unpack_optional_type(annotation: typing.Union) -> typing.Type:
 def get_marshmallow_field(annotation):
     validate_annotation(annotation)
 
-    opts = {}
+    field = None
 
+    opts = {}
+    args = []
     if is_optional(annotation):
         annotation = unpack_optional_type(annotation)
     else:
         opts["required"] = True
 
-    return TYPE_MAPPING.get(annotation)(**opts)
+    if is_many(annotation):
+        opts["many"] = True
+        annotation = unpack_many(annotation)
+
+    if annotation is list:
+        field = fields.Raw
+        opts["many"] = True
+
+    if isinstance(annotation, SchemaMeta):
+        args.append(annotation)
+        field = fields.Nested
+
+    field = field or BASIC_TYPES_MAPPING.get(annotation)
+
+    return field(*args, **opts)
 
 
 def get_fields_from_annotations(annotations):
@@ -106,6 +126,7 @@ class SchemaMeta(BaseSchemaMeta):
             bases,
             {**attrs, **get_fields_from_annotations(attrs.get("__annotations__", {}))},
         )
+        setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))
         return new_class
 
 
@@ -114,5 +135,4 @@ class Schema(with_metaclass(SchemaMeta, BaseSchema)):
 
     @post_load
     def make_object(self, data):
-        # todo: take only needed from base class
-        return dataclass(self.__class__)(**data)
+        return self._dataclass(**data)

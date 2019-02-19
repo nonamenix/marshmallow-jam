@@ -31,7 +31,7 @@ class User(Schema):
 class Response(Schema):
     user: User
 
-response = Response.load({"user": {"name": "Vasya Pupkin"}})
+response: Response = Response.load({"user": {"name": "Vasya Pupkin"}})
 response.user.name
 ```
 
@@ -63,8 +63,8 @@ All fields will be `required` for make it optional use `typing.Optional[X]`
 | `list` | `fields.Raw(many=True)` | 
 | `typing.List[float]` | `fields.List(fields.Float())` | 
  
- 
- ### Nested 
+
+### Nested 
   
 | annotation | marshmallow field |
 |--------------|-------------------| 

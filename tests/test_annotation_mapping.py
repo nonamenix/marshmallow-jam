@@ -51,7 +51,7 @@ def test_required_field():
     class Response(Schema):
         required_field: int
 
-    assert repr(Response().__dict__["declared_fields"]["required_field"]) == repr(
+    assert repr(Response().declared_fields["required_field"]) == repr(
         fields.Integer(required=True)
     )
 
