@@ -63,13 +63,6 @@ def test_optional():
     assert repr(Response().declared_fields["optional_field"]) == repr(fields.Integer())
 
 
-# @pytest.mark.skipped()
-# def test_common():
-# class Response(Schema):
-#     a: int
-#     b = None
-#     c = fields.Integer()
-
 # @pytest.mark.parametrize(
 #     "attr_type,field,data,loaded", [
 #         # (

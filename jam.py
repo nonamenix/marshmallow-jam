@@ -1,6 +1,6 @@
 import typing as typing
 import logging
-
+from dataclasses import dataclass
 
 from marshmallow import fields, post_load
 from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema, with_metaclass
@@ -114,6 +114,5 @@ class Schema(with_metaclass(SchemaMeta, BaseSchema)):
 
     @post_load
     def make_object(self, data):
-        # todo: hide it in _data and use getattr
-        self.__dict__ = {**data}
-        return self
+        # todo: take only needed from base class
+        return dataclass(self.__class__)(**data)
