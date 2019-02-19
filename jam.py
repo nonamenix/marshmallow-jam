@@ -47,9 +47,15 @@ def validate_annotation(annotation: typing.Type) -> None:
         raise NotValidAnnotation()
 
 
-# todo: flat_sequence? set, tuple, etc
-def is_list(annotation: typing.Type) -> bool:
+def is_nested_schema(annotation: typing.Type) -> bool:
     return False
+
+
+# todo: flat_sequence? set, tuple, etc
+def is_many(annotation: typing.Type) -> bool:
+    return (
+        hasattr(annotation, "__origin__") and annotation.__origin__ is list
+    ) or annotation is list
 
 
 def is_optional(annotation: typing.Type) -> bool:
@@ -108,5 +114,6 @@ class Schema(with_metaclass(SchemaMeta, BaseSchema)):
 
     @post_load
     def make_object(self, data):
-        self.__dict__ = {**self.__dict__, **data}
+        # todo: hide it in _data and use getattr
+        self.__dict__ = {**data}
         return self
