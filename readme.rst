@@ -3,6 +3,15 @@ Marshmallow Jam
 
 Some extra sweets for marshmallow.
 
+|version| |pipeline status| |coverage report|
+
+.. |pipeline status| image:: https://gitlab.com/nonamenix/marshmallow-jam/badges/master/pipeline.svg
+   :target: https://gitlab.com/nonamenix/marshmallow-jam/commits/master
+.. |coverage report| image:: https://gitlab.com/nonamenix/marshmallow-jam/badges/master/coverage.svg
+   :target: https://gitlab.com/nonamenix/marshmallow-jam/commits/master
+.. |version| image:: https://badge.fury.io/py/marshmallow-jam.svg
+   :target: https://badge.fury.io/py/marshmallow-jam
+
 Examples
 --------
 
