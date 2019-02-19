@@ -19,6 +19,7 @@ Use annotations for schema description.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
+
    from jam import Schema
 
    class Bar(Schema):
