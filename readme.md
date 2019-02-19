@@ -53,7 +53,7 @@ response.user.name
 | `dt.date` | ` fields.Date` |
 | `dt.timedelta` | ` fields.TimeDelta` |
  
-All fields will be `required` for make it optional use `typing.Optiona[X]`
+All fields will be `required` for make it optional use `typing.Optional[X]`
  
 
 ### Many
