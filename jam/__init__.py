@@ -59,7 +59,7 @@ def is_optional(annotation: typing.Type) -> bool:
 
 def unpack_optional_type(annotation: typing.Union) -> typing.Type:
     """Optional[Type] -> Type"""
-    return [t for t in annotation.__args__ if t is not NoneType][0]
+    return next(t for t in annotation.__args__ if t is not NoneType)
 
 
 def get_marshmallow_field(annotation):
