@@ -19,32 +19,27 @@ Use annotations for schema description.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
+   from jam import Schema
 
-   class Response(Schema):
-       a: float
-       b: Optional[dt.datetime]
+   class Bar(Schema):
+    baz: str
+
+   class Foo(Schema):
+       bar: Bar
+
+   foo: Foo = Foo().load({"bar": {"baz": "quux"}})
+
+   assert foo.bar.baz == "quux"
+
 
 When annotations not enough
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: python
 
-   class Response(Schema):
-       c: str = fields.Email()
+   class Foo(Schema):
+       bar: str = fields.Email()
 
-And IDE autocomplete cause now your data is instances of relevant classes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code:: python
-
-   class User(Schema):
-       name: str
-
-   class Response(Schema):
-       user: User
-
-   response: Response = Response.load({"user": {"name": "Vasya Pupkin"}})
-   response.user.name
 
 Mapping rules
 -------------
