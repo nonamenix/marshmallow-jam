@@ -21,5 +21,3 @@ def test_sum_of_attrs():
     with pytest.raises(TypeError):
         response.bar.quex + response.foo
         response.bars[0].quex + response.foo
-
-
