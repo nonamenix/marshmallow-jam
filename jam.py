@@ -26,11 +26,6 @@ BASIC_TYPES_MAPPING = {
     dt.timedelta: fields.TimeDelta,
 }
 
-# tuple: fields.Raw,
-# list: fields.List,
-# List: fields.List,
-# set: fields.Raw,
-
 
 NoneType = type(None)
 UnionType = type(typing.Union)
@@ -42,15 +37,6 @@ class JamException(Exception):
 
 class NotValidAnnotation(JamException):
     pass
-
-
-def validate_annotation(annotation: typing.Type) -> None:
-    if False:
-        raise NotValidAnnotation()
-
-
-def is_nested_schema(annotation: typing.Type) -> bool:
-    return False
 
 
 # todo: flat_sequence? set, tuple, etc
@@ -77,8 +63,6 @@ def unpack_optional_type(annotation: typing.Union) -> typing.Type:
 
 
 def get_marshmallow_field(annotation):
-    validate_annotation(annotation)
-
     field = None
 
     opts = {}
