@@ -23,7 +23,7 @@ Use annotations for schema description.
    from jam import Schema
 
    class Bar(Schema):
-    baz: str
+       baz: str
 
    class Foo(Schema):
        bar: Bar
