@@ -1,6 +1,7 @@
 import typing as typing
 import logging
 from dataclasses import dataclass
+from typing import get_type_hints
 
 from marshmallow import fields, post_load
 from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema, with_metaclass
@@ -102,14 +103,19 @@ def get_fields_from_annotations(annotations):
     }
 
 
+def _skip_fields_from_annotations(annotations, attrs):
+    return {attr_name: attr_value for attr_name, attr_value in attrs.items()
+            if attr_name not in annotations or attr_value is not None}
+
+
 class SchemaMeta(BaseSchemaMeta):
     def __new__(mcs, name, bases, attrs):
-        new_class = super().__new__(
-            mcs,
-            name,
-            bases,
-            {**attrs, **get_fields_from_annotations(attrs.get("__annotations__", {}))},
-        )
+        annotations = attrs.get("__annotations__", {})
+
+        attrs = _skip_fields_from_annotations(annotations, attrs)
+        attrs = {**get_fields_from_annotations(annotations), **attrs}
+
+        new_class = super().__new__(mcs, name, bases, attrs)
         setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))
         return new_class
 
