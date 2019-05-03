@@ -2,7 +2,6 @@ import typing as t
 import datetime as dt
 import uuid
 import decimal
-from dataclasses import dataclass
 
 import pytest
 

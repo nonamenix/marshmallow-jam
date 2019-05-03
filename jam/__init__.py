@@ -1,7 +1,6 @@
 import typing as typing
 import logging
 from dataclasses import dataclass
-from typing import get_type_hints
 
 from marshmallow import fields, post_load
 from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema, with_metaclass
