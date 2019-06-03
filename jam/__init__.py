@@ -59,7 +59,7 @@ def is_optional(annotation: typing.Type) -> bool:
 
 def unpack_optional_type(annotation: typing.Union) -> typing.Type:
     """Optional[Type] -> Type"""
-    return [t for t in annotation.__args__ if t is not NoneType][0]
+    return next(t for t in annotation.__args__ if t is not NoneType)
 
 
 def get_marshmallow_field(annotation):
@@ -102,14 +102,19 @@ def get_fields_from_annotations(annotations):
     }
 
 
+def _skip_fields_from_annotations(annotations, attrs):
+    return {attr_name: attr_value for attr_name, attr_value in attrs.items()
+            if attr_name not in annotations or attr_value is not None}
+
+
 class SchemaMeta(BaseSchemaMeta):
     def __new__(mcs, name, bases, attrs):
-        new_class = super().__new__(
-            mcs,
-            name,
-            bases,
-            {**attrs, **get_fields_from_annotations(attrs.get("__annotations__", {}))},
-        )
+        annotations = attrs.get("__annotations__", {})
+
+        attrs = _skip_fields_from_annotations(annotations, attrs)
+        attrs = {**get_fields_from_annotations(annotations), **attrs}
+
+        new_class = super().__new__(mcs, name, bases, attrs)
         setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))
         return new_class
 

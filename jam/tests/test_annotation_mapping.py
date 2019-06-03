@@ -61,3 +61,12 @@ def test_optional():
         optional_field: t.Optional[int] = None
 
     assert repr(Response().declared_fields["optional_field"]) == repr(fields.Integer())
+
+
+def test_strict_marshmallow_field():
+    class Response(Schema):
+        basic_field: int
+        email_field: str = fields.Email(required=True)
+
+    assert repr(Response().declared_fields["basic_field"]) == repr(fields.Integer(required=True))
+    assert repr(Response().declared_fields["email_field"]) == repr(fields.Email(required=True))
