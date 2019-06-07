@@ -1,6 +1,6 @@
 PROJECT = jam
 
-PYTHON_VERSION = 3.6
+PYTHON_VERSION ?= 3.7
 REQUIREMENTS = requirements.txt
 REQUIREMENTS_TEST = requirements-test.txt
 VIRTUAL_ENV ?= .venv
