@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 
 from marshmallow import fields, post_load
-from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema, with_metaclass
+from marshmallow.schema import SchemaMeta as BaseSchemaMeta, BaseSchema
 
 import datetime as dt
 import uuid
@@ -119,7 +119,7 @@ class SchemaMeta(BaseSchemaMeta):
         return new_class
 
 
-class Schema(with_metaclass(SchemaMeta, BaseSchema)):
+class Schema(BaseSchema, metaclass=SchemaMeta):
     __doc__ = BaseSchema.__doc__
 
     @post_load
