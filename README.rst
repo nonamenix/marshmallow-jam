@@ -3,14 +3,16 @@ Marshmallow Jam
 
 Some extra sweets for marshmallow.
 
-|version| |pipeline status| |coverage report|
+|version| |pipeline status| |coverage report| |python_version|
 
-.. |pipeline status| image:: https://gitlab.com/nonamenix/marshmallow-jam/badges/master/pipeline.svg
-   :target: https://gitlab.com/nonamenix/marshmallow-jam/commits/master
-.. |coverage report| image:: https://gitlab.com/nonamenix/marshmallow-jam/badges/master/coverage.svg
-   :target: https://gitlab.com/nonamenix/marshmallow-jam/commits/master
+.. |pipeline status| image:: https://img.shields.io/travis/nonamenix/marshmallow-jam.svg
+   :target: https://travis-ci.org/nonamenix/marshmallow-jam
+.. |coverage report| image:: https://coveralls.io/repos/github/nonamenix/marshmallow-jam/badge.svg?branch=master
+   :target: https://coveralls.io/github/nonamenix/marshmallow-jam?branch=master
 .. |version| image:: https://badge.fury.io/py/marshmallow-jam.svg
    :target: https://badge.fury.io/py/marshmallow-jam
+.. |python_version| image:: https://img.shields.io/badge/python-3.7-blue.svg
+   :target: https://docs.python.org/3/whatsnew/3.7.html
 
 Examples
 --------

@@ -115,7 +115,7 @@ class SchemaMeta(BaseSchemaMeta):
         attrs = {**get_fields_from_annotations(annotations), **attrs}
 
         new_class = super().__new__(mcs, name, bases, attrs)
-        setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))
+        setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))  # noqa: B010
         return new_class
 
 
