@@ -2,12 +2,11 @@
 
 coverage
 mock
-flake8
-flake8-bugbear
+flake8==3.7.7
+flake8-bugbear==19.3.0
 mccabe
 pycodestyle
-pytest
-pytest-aiohttp
-pytest-cov
-pytest-env
-pytest-flake8
+pytest==4.6.2
+pytest-cov==2.7.1
+pytest-env==0.6.2
+pytest-flake8==1.0.4
