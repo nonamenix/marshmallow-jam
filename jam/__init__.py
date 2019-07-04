@@ -3,27 +3,34 @@ import decimal
 import logging
 import typing as typing
 import uuid
+from dataclasses import is_dataclass, dataclass
+from functools import partial
 from inspect import getmembers
 
-from dataclasses import is_dataclass, dataclass
-from marshmallow import fields, RAISE, post_load
-from marshmallow.schema import Schema as MarshmallowSchema, BaseSchema, SchemaMeta as BaseSchemaMeta
+from marshmallow import Schema
+from marshmallow.fields import String, Float, Boolean, Integer, UUID, Decimal, List, Nested, Raw
+
+from jam.fields import DateTimeIdentity, TimeIdentity, DateIdentity, TimeDeltaIdentity
 
 logger = logging.getLogger(__name__)
 
 sentinel = object()
 
+VALIDATION_SCHEMA_FIELD = "__jam_validation_schema__"
+SCHEMA_DATACLASS_FIELD = "__jam_schema_dataclass__"
+
+
 BASIC_TYPES_MAPPING = {
-    str: fields.String,
-    float: fields.Float,
-    bool: fields.Boolean,
-    int: fields.Integer,
-    uuid.UUID: fields.UUID,
-    decimal.Decimal: fields.Decimal,
-    dt.datetime: fields.DateTime,
-    dt.time: fields.Time,
-    dt.date: fields.Date,
-    dt.timedelta: fields.TimeDelta,
+    str: String,
+    float: Float,
+    bool: Boolean,
+    int: Integer,
+    uuid.UUID: UUID,
+    decimal.Decimal: Decimal,
+    dt.datetime: DateTimeIdentity,
+    dt.time: TimeIdentity,
+    dt.date: DateIdentity,
+    dt.timedelta: TimeDeltaIdentity,
 }
 
 NoneType = type(None)
@@ -78,17 +85,20 @@ def get_marshmallow_field(member, annotation):
         opts["required"] = True
 
     if is_many(field_type):
-        field_fabric = fields.List
+        field_fabric = List
         field_type = unpack_many(field_type)
 
     if is_dataclass(field_type):
-        field_type = get_class_schema(field_type)
-        field_fabric = fields.Nested
+        data_cls = field_type
+        dataclass_schema = get_dataclass_schema(data_cls)
+        field_type = partial(Nested, dataclass_schema())
 
-    field_type = field_type and BASIC_TYPES_MAPPING.get(field_type) or None
+    if field_type in BASIC_TYPES_MAPPING:
+        field_type = BASIC_TYPES_MAPPING[field_type]
+
     if field_fabric is not None:
         if field_type is None:
-            field_type = fields.Raw
+            field_type = Raw
         field = field_fabric(field_type(), **opts)
     elif field_type is not None:
         field = field_type(**opts)
@@ -97,7 +107,7 @@ def get_marshmallow_field(member, annotation):
     return field
 
 
-def get_fields_from_annotations(members, annotations):
+def _get_fields_from_annotations(members, annotations):
     mapped_fields = {}
     for attr_name, attr_type in annotations.items():
         member = members.get(attr_name, sentinel)
@@ -108,52 +118,51 @@ def get_fields_from_annotations(members, annotations):
     return mapped_fields
 
 
-def _get_class_fields(cls):
-    annotations = _get_class_annotations(cls)
-    members = dict(getmembers(cls))
-    return get_fields_from_annotations(members, annotations)
-
-
 def _get_class_annotations(cls):
     annotations = {}
     for base_class in cls.__mro__:
-        # TODO: raise if duplicate annotations found?
         annotations.update(base_class.__dict__.get("__annotations__", {}))
     return annotations
 
 
-def get_class_schema(cls):
-    # TODO: allow to parametrize Meta
-    class _SchemaMeta:
-        unknown = RAISE
+def _get_class_fields(cls):
+    annotations = _get_class_annotations(cls)
+    members = dict(getmembers(cls))
+    return _get_fields_from_annotations(members, annotations)
 
-    fields = _get_class_fields(cls)
-    schema_cls = type(f"{cls.__name__}ValidationSchema", (MarshmallowSchema,), {**fields, "Meta": _SchemaMeta})
+
+class BaseSchema(Schema):
+    def load(self, data, *, many=None, partial=None, unknown=None):
+        result = super().load(data, many=many, partial=partial, unknown=unknown)
+        data_cls = getattr(self, SCHEMA_DATACLASS_FIELD)
+        return data_cls(**result)
+
+
+def get_dataclass_schema(cls: type, meta: type = None):
+    class_fields = _get_class_fields(cls)
+    attrs = class_fields
+    if meta is not None:
+        attrs["Meta"] = meta
+    schema_cls = type(f"{cls.__name__}ValidationSchema", (BaseSchema,), {**class_fields, "Meta": meta, SCHEMA_DATACLASS_FIELD: cls})
     return schema_cls
 
 
-def _skip_fields_from_annotations(annotations, attrs):
-    return {
-        attr_name: attr_value
-        for attr_name, attr_value in attrs.items()
-        if attr_name not in annotations or attr_value is not None
-    }
-
-
-class SchemaMeta(BaseSchemaMeta):
+class WithSchemaMeta(type):
     def __new__(mcs, name, bases, attrs):
-        annotations = attrs.get("__annotations__", {})
-        class_fields = get_fields_from_annotations(attrs, annotations)
-        attrs = {**class_fields, **_skip_fields_from_annotations(annotations, attrs)}
+        meta = attrs.pop("Meta", None)
         new_class = super().__new__(mcs, name, bases, attrs)
-
-        setattr(new_class, "_dataclass", dataclass(type(name, (), attrs)))  # noqa: B010
+        schema_cls = get_dataclass_schema(new_class, meta)
+        setattr(new_class, VALIDATION_SCHEMA_FIELD, schema_cls())
         return new_class
 
 
-class Schema(BaseSchema, metaclass=SchemaMeta):
-    __doc__ = BaseSchema.__doc__
+@dataclass
+class Base(metaclass=WithSchemaMeta):
 
-    @post_load
-    def make_object(self, data, **kwargs):
-        return self._dataclass(**data)
+    # def __post_init__(self):
+    #     self.load(asdict(self))
+
+    @classmethod
+    def load(cls, data, *, many=None, partial=None, unknown=None):
+        schema = getattr(cls, VALIDATION_SCHEMA_FIELD)
+        return schema.load(data, many=many, partial=partial, unknown=unknown)
