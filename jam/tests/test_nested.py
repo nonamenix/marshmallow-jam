@@ -1,30 +1,28 @@
 import typing
+from dataclasses import dataclass
 
-import pytest
-
-from jam import Schema
+from jam import Base
 
 
-@pytest.mark.skip("Delete this functionality?")
-def test_nested_schema():
-    class Bar(Schema):
+def test_nested_dataclass():
+    @dataclass
+    class Bar(Base):
         baz: str
 
-    class Foo(Schema):
+    @dataclass
+    class Foo(Base):
         bar: Bar
 
-    foo = Foo().load({"bar": {"baz": "quux"}})
-    assert foo.bar.baz == "quux"
+    assert Foo.load({"bar": {"baz": "aaa"}}) == Foo(bar=Bar(baz="aaa"))
 
 
-@pytest.mark.skip("Delete this functionality?")
-def test_nested_many_schema():
-    class Bar(Schema):
+def test_nested_many():
+    @dataclass
+    class Bar(Base):
         baz: str
 
-    class Foo(Schema):
+    @dataclass
+    class Foo(Base):
         bar: typing.List[Bar]
 
-    foo: Foo = Foo().load({"bar": [{"baz": "quux"}]})
-
-    assert foo.bar[0].baz == "quux"
+    assert Foo.load({"bar": [{"baz": "aaa"}]}) == Foo(bar=[Bar(baz="aaa")])

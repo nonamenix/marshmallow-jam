@@ -1,8 +1,9 @@
 import typing
+from dataclasses import dataclass
 
 import pytest
 
-from jam import is_many, unpack_many, Schema
+from jam import is_many, unpack_many, Base
 
 
 @pytest.mark.parametrize(
@@ -24,8 +25,9 @@ def test_unpack_many(annotation, expected):
 
 
 def test_list_with_dict():
-    class Response(Schema):
+    @dataclass
+    class Response(Base):
         foo: list
 
-    response: Response = Response().load({"foo": [{"a": 1}, {"a": 1}]})
+    response: Response = Response.load({"foo": [{"a": 1}, {"a": 1}]})
     assert response.foo
