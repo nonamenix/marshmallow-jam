@@ -11,7 +11,7 @@ from jam import is_many, unpack_many, Schema
         (typing.List[int], True),
         (int, False),
         # edge case
-        (list, False),
+        (list, True),
     ],
 )
 def test_is_many(annotation, expected):
