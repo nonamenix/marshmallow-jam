@@ -42,6 +42,7 @@ if DEV_VERSION:
 with open(README_TXT, "wb") as f:
     f.write(LONG_DESCRIPTION.encode())
 
+# TODO: dataclasses as optional dependency for Python 3.6
 setup(
     name=NAME,
     version=VERSION,

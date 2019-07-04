@@ -1,8 +1,11 @@
 import typing
 
+import pytest
+
 from jam import Schema
 
 
+@pytest.mark.skip("Delete this functionality?")
 def test_nested_schema():
     class Bar(Schema):
         baz: str
@@ -14,6 +17,7 @@ def test_nested_schema():
     assert foo.bar.baz == "quux"
 
 
+@pytest.mark.skip("Delete this functionality?")
 def test_nested_many_schema():
     class Bar(Schema):
         baz: str
