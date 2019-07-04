@@ -5,7 +5,7 @@ Some extra sweets for marshmallow.
 
 |version| |pipeline status| |coverage report| |python_version|
 
-.. |pipeline status| image:: https://img.shields.io/travis/nonamenix/marshmallow-jam.svg
+.. |pipeline status| image:: https://travis-ci.org/nonamenix/marshmallow-jam.svg?branch=master
    :target: https://travis-ci.org/nonamenix/marshmallow-jam
 .. |coverage report| image:: https://coveralls.io/repos/github/nonamenix/marshmallow-jam/badge.svg?branch=master
    :target: https://coveralls.io/github/nonamenix/marshmallow-jam?branch=master
